@@ -59,7 +59,11 @@ public class MainActivity extends AppCompatActivity {
 
             List<String> list = new ArrayList<String>();
             for(int i = 0; i < data.length(); i++){
-                list.add(data.getJSONObject(i).getString("name"));
+                try {
+                    list.add(data.getJSONObject(i).getString("name"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
 
             ArrayAdapter listAdapter = new ArrayAdapter<String>(MainActivity.this, R.layout.raw, list);
