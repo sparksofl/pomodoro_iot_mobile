@@ -56,7 +56,13 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
-            ArrayAdapter listAdapter = new ArrayAdapter<String>(MainActivity.this, R.layout.raw, data.toString().replace("},{", " ,").split(" "));
+
+            List<String> list = new ArrayList<String>();
+            for(int i = 0; i < data.length(); i++){
+                list.add(data.getJSONObject(i).getString("name"));
+            }
+
+            ArrayAdapter listAdapter = new ArrayAdapter<String>(MainActivity.this, R.layout.raw, list);
             lv.setAdapter(listAdapter);
             Logger.getAnonymousLogger().log(Level.INFO, data.toString());
             return;
