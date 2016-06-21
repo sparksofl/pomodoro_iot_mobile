@@ -2,9 +2,17 @@ package ua.nure.solodovnik.pomodoro_iot_mobile;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
+
+import com.pusher.client.Pusher;
+import com.pusher.client.channel.Channel;
+import com.pusher.client.channel.SubscriptionEventListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,6 +35,29 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         JSONArray j = null;
         new DemoTask().execute();
+
+        Pusher pusher = new Pusher("1991c289a458393cc0e0");
+        pusher.connect();
+        Channel channel = pusher.subscribe("android_channel");
+
+        final Handler mHandler = new Handler(Looper.getMainLooper()) {
+            @Override
+            public void handleMessage(Message message) {
+                Toast toast = Toast.makeText(getApplicationContext(),
+                        message.obj.toString(), Toast.LENGTH_SHORT);
+                toast.show();
+            }
+        };
+
+
+        channel.bind("test_event", new SubscriptionEventListener() {
+            @Override
+            public void onEvent(String channelName, String eventName, final String data) {
+                Message message = mHandler.obtainMessage(1, data);
+                message.sendToTarget();
+            }
+
+        });
     }
 
 
@@ -35,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
         JSONArray data;
         protected Integer doInBackground(Void... arg0)  {
             try {
-                data = getJSONObjectFromURL("http://pomodoro-iot-preview.herokuapp.com/tasks.json");
+                data = getJSONObjectFromURL("https://pomodoro-iot-api.herokuapp.com//tasks.json");
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (JSONException e) {
